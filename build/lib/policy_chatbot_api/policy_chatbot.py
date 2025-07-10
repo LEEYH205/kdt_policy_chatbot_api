@@ -7,10 +7,9 @@ import os
 from typing import List, Dict, Tuple
 import re
 from numpy.linalg import norm
-import pkg_resources
 
 class PolicyChatbot:
-    def __init__(self, csv_path: str = None, model_name: str = "sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens"):
+    def __init__(self, csv_path: str = "./data/gyeonggi_smallbiz_policies_2000_소상공인,경기_20250705.csv", model_name: str = "sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens"):
         """
         정책 챗봇 초기화
         
@@ -18,11 +17,6 @@ class PolicyChatbot:
             csv_path: 정책 데이터 CSV 파일 경로
             model_name: 임베딩 모델명
         """
-        if csv_path is None:
-            csv_path = pkg_resources.resource_filename(
-                "policy_chatbot_api",
-                "data/gyeonggi_smallbiz_policies_2000_소상공인,경기_20250705.csv"
-            )
         self.csv_path = csv_path
         self.model_name = model_name
         self.data = None
@@ -36,11 +30,7 @@ class PolicyChatbot:
         self._create_embeddings()
         
         # 지역 계층 구조 정의
-        self.region_hierarchy = self._get_region_hierarchy()
-        
-    def _get_region_hierarchy(self):
-        """지역 계층 구조 반환"""
-        return {
+        self.region_hierarchy = {
             # 전국, 서울, 경기만
             # 경기도 하위 지역들
             "포천시": ["포천시", "경기도", "전국"],
