@@ -1,13 +1,12 @@
 import pandas as pd
 import numpy as np
-from sentence_transformers import SentenceTransformer
-import faiss
-import pickle
-import os
-from typing import List, Dict, Tuple
 import re
+import pickle
+import faiss
+from sentence_transformers import SentenceTransformer
 from numpy.linalg import norm
 import pkg_resources
+import torch
 
 class PolicyChatbot:
     def __init__(self, csv_path: str = None, model_name: str = "sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens"):
@@ -15,7 +14,7 @@ class PolicyChatbot:
         정책 챗봇 초기화
         
         Args:
-            csv_path: 정책 데이터 CSV 파일 경로
+            csv_path: CSV 파일 경로 (None이면 패키지 내부 기본 파일 사용)
             model_name: 임베딩 모델명
         """
         if csv_path is None:
@@ -29,14 +28,24 @@ class PolicyChatbot:
         self.embeddings = None
         self.index = None
         self.model = None
-        
-        # 데이터 로드 및 모델 초기화
+        self.device = self._get_optimal_device()
+        self.region_hierarchy = self._get_region_hierarchy()
         self._load_data()
         self._initialize_model()
         self._create_embeddings()
         
-        # 지역 계층 구조 정의
-        self.region_hierarchy = self._get_region_hierarchy()
+    def _get_optimal_device(self):
+        """환경에 맞는 최적의 디바이스 선택"""
+        if torch.cuda.is_available():
+            device = "cuda"
+            print(f"🚀 CUDA GPU 사용: {torch.cuda.get_device_name()}")
+        elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+            device = "mps"
+            print("🍎 Apple Silicon GPU (MPS) 사용")
+        else:
+            device = "cpu"
+            print("💻 CPU 사용")
+        return device
         
     def _get_region_hierarchy(self):
         """지역 계층 구조 반환"""
@@ -164,12 +173,12 @@ class PolicyChatbot:
         """임베딩 모델 초기화"""
         try:
             print("임베딩 모델 로딩 중...")
-            self.model = SentenceTransformer(self.model_name)
+            self.model = SentenceTransformer(self.model_name, device=self.device)
             print("모델 로딩 완료")
         except Exception as e:
             print(f"모델 로딩 실패: {e}")
             # 한국어에 특화된 모델로 대체
-            self.model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+            self.model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2', device=self.device)
     
     def _create_embeddings(self):
         """텍스트 임베딩 생성 및 FAISS 인덱스 구축"""
