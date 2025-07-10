@@ -32,7 +32,7 @@ def read_requirements():
 
 setup(
     name="policy-chatbot-api",
-    version="1.0.2",
+    version="1.0.3",
     author="KDT Hackathon Team (B2A5)",
     author_email="ejrdkachry@gmail.com",
     description="한국 지역 정책 검색 API 패키지",
