@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uvicorn
-from .policy_chatbot import PolicyChatbot
+from policy_chatbot_api.policy_chatbot import PolicyChatbot
 import logging
 
 # 로깅 설정
@@ -268,7 +268,7 @@ def main():
     args = parser.parse_args()
     
     uvicorn.run(
-        "policy_chatbot_api.api_server:app",
+        app,
         host=args.host,
         port=args.port,
         reload=args.reload,

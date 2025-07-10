@@ -1,0 +1,2 @@
+[console_scripts]
+policy-api = policy_chatbot_api.api_server:main
