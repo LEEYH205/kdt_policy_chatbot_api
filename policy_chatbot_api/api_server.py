@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uvicorn
-from policy_chatbot_api.policy_chatbot import PolicyChatbot
+from .policy_chatbot import PolicyChatbot
+from policy_chatbot_api import __version__
 import logging
 
 # 로깅 설정
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="정책 챗봇 API",
     description="정책 검색 및 추천을 위한 AI 챗봇 API",
-    version="1.0.0",
+    version=__version__,
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -247,7 +248,7 @@ async def root():
     """API 루트 엔드포인트"""
     return {
         "message": "정책 챗봇 API에 오신 것을 환영합니다!",
-        "version": "1.0.0",
+        "version": __version__,
         "docs": "/docs",
         "health": "/health"
     }
