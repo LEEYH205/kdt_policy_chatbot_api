@@ -1,6 +1,5 @@
-from setuptools import setup, find_packages
 import os
-from policy_chatbot_api import __version__
+import re
 
 # README 파일 읽기
 def read_readme():
@@ -31,9 +30,16 @@ def read_requirements():
             "PyYAML>=6.0"
         ]
 
+def read_version():
+    with open(os.path.join("policy_chatbot_api", "__init__.py"), "r", encoding="utf-8") as f:
+        content = f.read()
+    return re.search(r'__version__\s*=\s*["\\\']([^"\"]+)["\"]', content).group(1)
+
+from setuptools import setup, find_packages
+
 setup(
     name="policy-chatbot-api",
-    version=__version__,
+    version=read_version(),
     author="KDT Hackathon Team (B2A5)",
     author_email="ejrdkachry@gmail.com",
     description="한국 지역 정책 검색 API 패키지",
